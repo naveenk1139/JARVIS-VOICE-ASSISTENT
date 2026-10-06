@@ -140,3 +140,15 @@ cython_debug/
 # IDE/Editor
 .vscode
 .idea
+# --- JARVIS runtime data (notes, reminders, remembered facts, history) ------
+/data/
+*.tmp
+
+# --- local configuration / secrets ------------------------------------------
+.env
+.env.local
+
+# --- desktop extras ---------------------------------------------------------
+Face-Recognition/trainer/
+Face-Recognition/dataset/
+screenshots/

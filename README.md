@@ -1,124 +1,285 @@
-<h1 align="center">J.A.R.V.I.S </h1> 
+# J.A.R.V.I.S
 
-<div align="center">
-  
-[![Welcome to my profile](https://img.shields.io/badge/Hello,Devs!-Welcome-blue.svg?style=flat&logo=github)](https://github.com/gauravsingh9356/J.A.R.V.I.S)
-[![Open Source Love](https://badges.frapsoft.com/os/v2/open-source.svg?v=103)](https://github.com/gauravsingh9356/J.A.R.V.I.S)
- [![GitHub issues](https://img.shields.io/github/issues/GauravSingh9356/J.A.R.V.I.S)](https://github.com/GauravSingh9356/J.A.R.V.I.S/issues)
-![Stars](https://img.shields.io/github/stars/gauravsingh9356/J.A.R.V.I.S?style=flat&logo=github)
-![Forks](https://img.shields.io/github/forks/gauravsingh9356/J.A.R.V.I.S?style=flat&logo=github)
-[![GitHub license](https://img.shields.io/github/license/GauravSingh9356/J.A.R.V.I.S)](https://github.com/GauravSingh9356/J.A.R.V.I.S/blob/master/LICENSE)
-  
-[![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
+**Just A Rather Very Intelligent System** — a modular voice assistant with a browser interface,
+a desktop console, and a pluggable skill registry. Talk to it, type to it, or call its HTTP API.
 
-  </div>
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Tests](https://img.shields.io/badge/tests-170%20passing-brightgreen.svg)](#testing)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Code style](https://img.shields.io/badge/lint-ruff-261230.svg)](https://docs.astral.sh/ruff/)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-orange.svg)](#contributing)
 
+<img src="jarvis1.jpg" alt="J.A.R.V.I.S" width="100%">
 
+---
 
-<img src="jarvis1.jpg"/>
+## Why this exists
 
-### Requirements:
+This repository started as a collection of single-file scripts: one for weather, one for
+news, one for the dictionary, each with a hardcoded Windows path, placeholder API keys and a
+copy of the same `speak()` function. It only ran on the author's laptop, and only with a webcam
+plugged in.
 
-<li>datetime</li>
-<li>os</li>
-<li> pyttsx3</li>
-<li> wikipedia</li>
-<li> speech_recognition </li>
-<li> webbrowser</li>
-<li> sys</li>
-<li> smtplib</li>
-<li>requests</li>
-<li>json</li>
-<li>defflib</li>
-<li>geocoder</li>
-<li>pyjokes</li>
-<li>psutil</li>
-<li> pyautogui</li>
-<li> opencv</li>
+JARVIS 2.0 is a rewrite of that idea into something you can actually install, run and extend:
 
-<h2>Required Packages</h2>
+| Before | Now |
+| --- | --- |
+| `jarvis.py` + 7 loose scripts | one installable package (`jarvis`) |
+| Hardcoded `C:\Users\gs935\...` paths | cross-platform config, auto-detection |
+| `newsapi.org` placeholder key → always failed | public RSS feeds, no key required |
+| Crash without a webcam or a trained face model | face unlock is optional and reports its status |
+| Same `speak()` copied into five files | one engine, one service layer |
+| Speech only through a microphone | browser UI (Web Speech API), desktop microphone, or typed input |
+| `exec(open('youtube_downloader.py').read())` | proper skills with regex intents and tests |
+| No tests | 170 tests, no network, microphone or camera needed |
 
-```
-pip install -r requirements.txt
-```
+The original scripts are preserved untouched in [`legacy/`](legacy/README.md).
 
-> _ To install PyAudio on windows head over to https://www.lfd.uci.edu/~gohlke/pythonlibs/#pyaudio and download the .whl for your machine and run the installation as shown below, then install the remaining dependencies from the requirements.txt file. You may remove pyAduio from the requirements file if it interrupts your installation (its there for unix users)
+---
+
+## Features
+
+**Everything below works from the browser UI, the desktop console and `jarvis ask`.**
+
+| Skill | What it does | Example |
+| --- | --- | --- |
+| `weather` | Current conditions and coordinates, via Open-Meteo (no API key needed) | *"What is the weather in Bengaluru?"* |
+| `news` | Top headlines from public RSS feeds, spoken and clickable | *"What are the headlines?"* → *"open the second one"* |
+| `wikipedia` | Factual answers, with the full article a click away | *"Who is Ada Lovelace?"* |
+| `dictionary` | Definitions and spelling, offline corpus first | *"Define serendipity"* |
+| `notes` | To-dos and long-term memory that survives restarts | *"Add buy milk to my to-do list"* |
+| `time` | Time, date, timers and reminders | *"Remind me in 10 minutes to stretch"* |
+| `calculator` | Arithmetic through a safe AST walker (never `eval`) | *"What is 15% of 240?"* |
+| `web` | Opens sites, runs searches, shows maps, plays local music | *"Search YouTube for lo-fi beats"* |
+| `youtube` | Search links and video metadata | *"youtube lofi hip hop"* |
+| `email` | Slot-filled composer over your own SMTP account (opt-in) | *"Send an email to priya@example.com"* |
+| `system` | CPU, memory, battery, disk and platform telemetry | *"System status"* |
+| `jokes` | Bundled clean joke set, optional online source | *"Tell me a joke"* |
+| `smalltalk` | Greetings, identity, persona switching | *"Switch to FRIDAY"* |
+| `help` | Self-describing capability list | *"What can you do?"* |
+| `goodbye` | Ends the session — it never powers off your computer | *"Go to sleep"* |
+
+**Nice-to-haves**
+
+- Optional LLM fallback (OpenAI-compatible or Anthropic) for questions no skill covers.
+- Optional face unlock on the desktop — off by default, and it tells you what is missing
+  instead of crashing.
+- `jarvis doctor` checks every optional dependency and prints exactly what to install.
+- Offline mode (`JARVIS_OFFLINE=true`) for demos, flights and the test suite.
+
+---
+
+## Quickstart
+
+### 1. The browser UI (recommended — no microphone drivers, works on any OS)
+
 ```bash
-pip install PyAudio‑0.2.11‑cp<version>‑cp<version>m‑win_amd<architecture>.whl
+git clone https://github.com/naveenk1139/JARVIS-VOICE-ASSISTENT.git
+cd JARVIS-VOICE-ASSISTENT
+
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -e ".[server]"
+
+jarvis serve
 ```
 
-### On Ubuntu based Linux distribution you need to install the following packages, so that the code works:
+Open <http://localhost:8000>, press **Hold to talk** (or hold the space bar), and speak —
+or just type. Speech recognition and speech synthesis run in the browser, so there is nothing
+else to install.
+
+### 2. The desktop console (microphone + offline text-to-speech)
+
+```bash
+pip install -e ".[server,voice,mic,system]"   # Linux also needs: sudo apt install portaudio19-dev espeak-ng
+
+jarvis desktop                # microphone if available, typed input otherwise
+jarvis desktop --input text   # force typed input
+```
+
+### 3. One-shot commands
+
+```bash
+jarvis ask "what is the weather in Pune"
+jarvis ask "remind me in 20 minutes to check the oven"
+jarvis skills                 # list every registered skill
+jarvis doctor                 # environment check
+```
+
+> **Windows users:** the old repository shipped a Python 3.8 `PyAudio` wheel. Modern Python
+> gets it from PyPI: `pip install "jarvis-assistant[mic]"`.
+
+---
+
+## Configuration
+
+Everything is optional and comes from the environment (or a `.env` file):
+
+```bash
+cp .env.example .env
+```
+
+The settings you are most likely to change:
+
+```bash
+JARVIS_USER_NAME=Aarav              # how the assistant addresses you
+JARVIS_LOCATION=Bengaluru           # blank = detect from IP
+JARVIS_PERSONA=friday               # feminine voice + FRIDAY persona
+JARVIS_MUSIC_DIR=~/Music            # backdrop for "play music"
+
+# Optional: send email (use a Gmail App Password, never your account password)
+JARVIS_SMTP_USER=you@gmail.com
+JARVIS_SMTP_PASSWORD=xxxx xxxx xxxx xxxx
+JARVIS_EMAIL_FROM=you@gmail.com
+
+# Optional: open-ended questions
+JARVIS_LLM_API_KEY=sk-...
+JARVIS_LLM_PROVIDER=openai          # or "anthropic"; any OpenAI-compatible base URL works
+JARVIS_LLM_BASE_URL=http://localhost:11434/v1   # e.g. local Ollama
+```
+
+See [docs/CONFIGURATION.md](docs/CONFIGURATION.md) for the complete list.
+
+---
+
+## Architecture
 
 ```
-sudo apt-get update && sudo apt-get install espeak
-
+                    ┌──────────────────────────────┐
+   browser mic ───► │  jarvis/web (HTML + JS UI)   │ ──► POST /api/command
+                    └──────────────────────────────┘            │
+                                                                ▼
+   desktop mic ───► jarvis/voice/listener ──┐        ┌────────────────────────┐
+                                            ├──────► │   jarvis/engine.py     │
+   stdin / CLI ─────────────────────────────┘        │  match → skill → reply │
+                                                     └───────────┬────────────┘
+                                                                 │
+                                        ┌────────────────────────┴───────────────┐
+                                        ▼                                        ▼
+                             jarvis/skills/*.py (intents)              jarvis/brains (optional LLM)
+                                        │
+                                        ▼
+                     jarvis/services/*.py — HTTP with retries, caching, offline mode
+                     weather · news · wikipedia · dictionary · jokes · system · youtube
 ```
 
-### What it does...
+- **Engine** — owns config, sessions, pending questions and dispatch.
+- **Skills** — declare regex intents (`patterns`) and implement `handle()`/`resume()`.
+- **Services** — wrap the outside world; every network call has a timeout, retries and a
+  friendly failure message.
+- **Front doors** — the browser UI, the desktop console and the CLI all speak to the same engine.
 
-  <ul>
-   <li>Dynamic Authentication using Optical Face Recognition</li>
-<li>Send emails</li>
-  <li>Dynamic News Reporting at any time with api integration</li>
-  <li>Todo list generator, Yes it remembers all!</li> 
-<li>Open any website with just a voice command</li>
-<li>Plays Music</li>
-<li>Tells time</li>
-<li>Wikipedia powered AI</li>
-<li>Dictionary with Intelligent Sensing i.e. auto checking if spell mistake</li>
-<li>Weather Report such as temp, wind speed, humidity, weather description</li>
-<li>Latitude and longitude</li>
- <li>YouTube searching</li> 
- <li>Google Map searching</a>
- <li>YouTube Downloader, download any youtube video by just putting url of video</li>
- <li>Now Master can switch b/w J.A.R.V.I.S and F.R.I.D.A.Y, switch to female voice assistant</li>
-</ul>
+Full details: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/SKILLS.md](docs/SKILLS.md)
 
-<table>
-  <tr>
-    <td><img src="images/Screenshot%20(138).png"/></td>
-      <td><img src="https://github.com/GauravSingh9356/J.A.R.V.I.S/blob/master/images/face-600x900.png"/></td>
-    
+---
 
-</tr>
-<tr>
-<td><img src="images/email.jpg"/></td>
-<td><img src="https://github.com/GauravSingh9356/J.A.R.V.I.S/blob/master/images/maxresdefault.jpg"/></td>
-</tr>
-<td><img src="https://github.com/GauravSingh9356/J.A.R.V.I.S/blob/master/images/4-Best-Weather-Forecast-APIs-for-Development-of-Weather-Apps-624x304.jpeg"/></td>
-  <td><img src="https://github.com/GauravSingh9356/J.A.R.V.I.S/blob/master/images/maxresdefault%20(1).jpg"/></td>
-</tr>
-<tr>
-  <td><img src="canny.jpg"/>
-          </td>
-  <td><img src="ImgContor.jpg"/>
-          </td>
-</tr>
-</table>
+## Writing your own skill
 
-## Some Sneak peeks:
+```python
+# jarvis/skills/coffee.py
+from jarvis.models import Match, Response
+from jarvis.skills.base import Skill
 
-<ul>
-  <li><h2> Jarvis, Are you there?</h2></li>
-  <li><h2> At your service, Sir</h2></li>
-  
-  <li><h2> Jarvis, What are today's news headlines? can you tell?</h2></li>
-  <li><h2>Ofcourse, Sir -> Then news headlines   Would you like to visit the news url?</h2></li>
-  
-  <li><h2> Search Youtube</h2></li>
-  <li><h2>What you want to search, Sir</h2></li>
-  <li><h2>Coding for kids</h2></li>
-  <li><h2> Opens youtube in browser with desired search query results </h2></li>
-  
-   <li><h2> Jarvis, Can you send email to Gaurav?</h2></li>
-  <li><h2>What I say sir, Sir</h2></li>
-   <li><h2>Gaurav is a good boy</h2></li>
-  <li><h2> Email is sent successfully, Sir</h2></li>
-  
-  # And so on....
-  
-<a href="https://techtalkswithgaurav.blogspot.com/2020/06/your-personal-assistant-jarvis.html" target="_blank">Read complete blog article</a>
 
-## Contribution:
-Thank you for your interest in contributing to our Repo! Pull requests are welcome. For fixing typos, please make a PR with your fixes. We are happy for every contribution.
-A lot can be done with this project. Core AI chatbot like functionality can be added. More python scripts can be associated. Pull requests for any such changes are accepted. Feel free to fork this project and make your own changes too.
+class CoffeeSkill(Skill):
+    name = "coffee"
+    description = "Track the office coffee machine."
+    priority = 40
+    examples = ("Is there coffee left?",)
+    patterns = (r"^(?P<check>is there (?:any )?coffee(?: left)?)\b",)
+
+    async def handle(self, match: Match, text: str) -> Response:
+        return Response.ok("The pot is half full. Brew more soon.")
+```
+
+Register it in `jarvis/skills/__init__.py` and it appears in the UI, the CLI, the help skill
+and the API automatically. Intents are plain regex, and each pattern carries a **named group**
+so the handler can dispatch on *which* intent matched. See [docs/SKILLS.md](docs/SKILLS.md).
+
+---
+
+## Testing
+
+```bash
+pip install -e ".[dev]"
+pytest                       # 170 tests, fully offline: no network, mic or camera
+pytest --cov=jarvis          # with coverage
+ruff check jarvis tests      # lint
+```
+
+The suite stubs the HTTP layer, so it is deterministic and CI-safe:
+
+```
+tests/test_engine.py      routing, pending questions, timeouts, crash containment
+tests/test_skills.py      every skill, from greetings to slot-filled email
+tests/test_services.py    HTTP retries, RSS parsing, WMO codes, dictionary fallbacks
+tests/test_server.py      every HTTP endpoint through an in-process ASGI client
+tests/test_desktop.py     speakers, listeners, wake word, face-unlock status paths
+tests/test_storage.py     atomic writes, note lifecycle, bounded history
+tests/test_config.py      env parsing, type coercion, .env handling
+tests/test_models.py      text normalisation and response serialisation
+```
+
+---
+
+## Project layout
+
+```
+jarvis/
+├── cli.py              jarvis serve | ask | desktop | skills | doctor | weather | train-face
+├── engine.py           match an utterance → run a skill → return a Response
+├── config.py           environment + .env configuration
+├── models.py           Response, Pending, Match, ServiceError, text normalisation
+├── context.py          services and stores handed to skills
+├── storage.py          notes, reminders, memory, history (atomic JSON writes)
+├── skills/             one module per capability
+├── services/           weather, news, wikipedia, dictionary, jokes, system, youtube, http
+├── brains/             optional LLM fallback (OpenAI-compatible / Anthropic)
+├── voice/              speakers, microphones, wake word
+├── security/           optional face unlock (OpenCV LBPH)
+├── server/             FastAPI app + HTTP API
+└── web/                browser UI (plain HTML/CSS/JS — no build step)
+legacy/                 the original scripts, preserved for reference
+docs/                   architecture, skills, configuration, face unlock, migration
+tests/                  the pytest suite
+```
+
+---
+
+## API
+
+| Method | Path | Purpose |
+| --- | --- | --- |
+| `GET` | `/` | the browser UI |
+| `POST` | `/api/command` | `{"text": "...", "session_id": "..."}` → a full response object |
+| `GET` | `/api/health` | engine status, skill count, active brain |
+| `GET` | `/api/skills` | skill catalog and example phrases |
+| `GET` | `/api/session` | pending question and recent transcript |
+| `POST` | `/api/reset` | clear a session |
+| `GET` | `/api/weather` | structured forecast for the HUD |
+| `GET` | `/api/notes` | open notes and remembered facts |
+| `GET` | `/api/reminders/due` | reminders that have come due |
+
+Interactive docs: <http://localhost:8000/docs>.
+Set `JARVIS_API_TOKEN` to require an `X-JARVIS-Token` header on every API call.
+
+---
+
+## Contributing
+
+Pull requests are very welcome — new skills especially.
+
+1. Fork and branch from `main`.
+2. Add your skill in `jarvis/skills/`, register it, add examples.
+3. Add tests (they must pass without network access).
+4. Run `pytest` and `ruff check jarvis tests`.
+5. Open a PR describing the intent patterns you added.
+
+Ideas that would fit well: calendar/ICS integration, Home Assistant control, Spotify playback,
+OCR of screenshots, a local Whisper speech backend, a streaming WebSocket UI.
+
+---
+
+## Credits & license
+
+Originally created by [Gaurav Singh](https://github.com/gauravsingh9356) as a hobby assistant,
+restructured here into a maintainable application. Released under the [MIT License](LICENSE).
