@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>J.A.R.V.I.S</title>
+  <meta name="description" content="JARVIS - a modular voice assistant you can talk to from the browser." />
+  <link rel="stylesheet" href="/static/styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%2338bdf8' stroke-width='8'/><circle cx='50' cy='50' r='16' fill='%2338bdf8'/></svg>" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="reactor" id="reactor" title="Idle">
+        <span class="ring ring-1"></span>
+        <span class="ring ring-2"></span>
+        <span class="core"></span>
+      </div>
+      <div class="brand-text">
+        <h1>J.A.R.V.I.S</h1>
+        <p id="status-line">Booting…</p>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <label class="switch" title="Speak replies out loud">
+        <input type="checkbox" id="speak-toggle" checked />
+        <span>Voice</span>
+      </label>
+      <label class="switch" title="Switch between JARVIS and FRIDAY">
+        <input type="checkbox" id="persona-toggle" />
+        <span>FRIDAY voice</span>
+      </label>
+      <button class="ghost" id="reset-btn" title="Clear the conversation">Reset</button>
+      <a class="ghost" href="/docs" target="_blank" rel="noreferrer" title="Open the HTTP API docs">API</a>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="console" aria-label="Conversation">
+      <div class="transcript" id="transcript" role="log" aria-live="polite"></div>
+
+      <div class="composer">
+        <button id="mic-btn" class="mic" aria-label="Hold to talk">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V22h2v-3.08A7 7 0 0 0 19 12h-2z"/></svg>
+          <span>Hold to talk</span>
+        </button>
+        <form id="text-form" class="text-form">
+          <input id="text-input" type="text" autocomplete="off" placeholder="Type a command, or press the microphone…" />
+          <button type="submit">Send</button>
+        </form>
+        <p class="hint" id="stt-hint">Speech recognition may be unavailable in this browser — typing always works.</p>
+      </div>
+    </section>
+
+    <aside class="hud" aria-label="Dashboard">
+      <div class="panel">
+        <h2>Status</h2>
+        <dl class="facts">
+          <dt>Time</dt><dd id="hud-time">--:--</dd>
+          <dt>Skills</dt><dd id="hud-skills">—</dd>
+          <dt>Brain</dt><dd id="hud-brain">—</dd>
+          <dt>Session</dt><dd id="hud-session">—</dd>
+        </dl>
+      </div>
+
+      <div class="panel">
+        <h2>Weather</h2>
+        <div id="hud-weather" class="weather">
+          <p class="muted">Fetching local conditions…</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Try saying</h2>
+        <div id="suggestions" class="chips"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Notes &amp; reminders</h2>
+        <ul id="hud-notes" class="notes"><li class="muted">Nothing stored yet.</li></ul>
+      </div>
+    </aside>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
